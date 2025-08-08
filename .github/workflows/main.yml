@@ -18,11 +18,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.HOST_NAME }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "${{ secrets.HOST_NAME }}" >> ~/.ssh/known_hosts
 
       - name: Deploy via SSH
         run: |
-          ssh ${{ secrets.USER_NAME }}@${{ secrets.HOST_NAME }} "
+          ssh "${{ secrets.USER_NAME }}"@"${{ secrets.HOST_NAME }}" "
             cd /var/www/html/fastapi &&
             git config --global --add safe.directory /var/www/html/fastapi &&
             git pull origin main &&
