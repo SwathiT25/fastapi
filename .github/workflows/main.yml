@@ -1,4 +1,4 @@
-name: Deploy to SSH Server
+name: Deploy FastAPI App
 
 on:
   push:
@@ -8,24 +8,23 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ secrets.HOST_NAME }}" >> ~/.ssh/known_hosts
 
       - name: Deploy via SSH
         run: |
-          ssh "${{ secrets.USER_NAME }}"@"${{ secrets.HOST_NAME }}" "
-            cd /var/www/html/fastapi &&
-            git config --global --add safe.directory /var/www/html/fastapi &&
-            git pull origin main &&
-            echo '🚀 Deployed Successfully'
-          "
-
+          ssh -i ~/.ssh/id_ed25519 "${{ secrets.USER_NAME }}"@"${{ secrets.HOST_NAME }}" << 'EOF'
+          set -e
+          cd ~/fastapi || exit
+          git config --global --add safe.directory ~/fastapi
+          git pull origin main
+          echo "Deployed successfully: $(git rev-parse --short HEAD)"
+          EOF
