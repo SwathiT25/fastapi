@@ -16,9 +16,11 @@ jobs:
       - name: Setup SSH private key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/gh_actions_ed25519
-          chmod 600 ~/.ssh/gh_actions_ed25519
-          ssh-keyscan -H 192.168.28.195 >> ~/.ssh/known_hosts
+    echo "${{ secrets.SSH_KEY_BASE64 }}" | base64 -d > ~/.ssh/gh_actions_ed25519
+    chmod 600 ~/.ssh/gh_actions_ed25519
+    ssh-keyscan -H 192.168.28.195 >> ~/.ssh/known_hosts
+
+
 
       - name: Deploy to server
         run: |
