@@ -1,0 +1,27 @@
+name: Deploy FastAPI App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH private key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY_BASE64 }}" | base64 -d > ~/.ssh/gh_actions_ed25519
+          chmod 600 ~/.ssh/gh_actions_ed25519
+          ssh-keyscan -H 192.168.28.195 >> ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/gh_actions_ed25519 -o StrictHostKeyChecking=no user@192.168.28.195 hostname
+
+      - name: Pull latest code on remote server
+        run: ssh -i ~/.ssh/gh_actions_ed25519 -o StrictHostKeyChecking=no user@192.168.28.195 'cd /var/www/html/fastapi && git pull origin main'
