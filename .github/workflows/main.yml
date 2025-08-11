@@ -18,13 +18,14 @@ jobs:
           printf "%s" "${{ secrets.SSH_KEY }}" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
           ssh-keyscan -H "${{ secrets.HOST_NAME }}" >> "$HOME/.ssh/known_hosts"
+          ssh-keygen -lf "$HOME/.ssh/id_ed25519" || { echo "Invalid SSH key format"; exit 1; }
 
       - name: Deploy via SSH
         run: |
           ssh -i "$HOME/.ssh/id_ed25519" -o StrictHostKeyChecking=no "${{ secrets.USER_NAME }}"@"${{ secrets.HOST_NAME }}" << 'EOF'
           set -e
-          cd ~/fastapi || exit
-          git config --global --add safe.directory ~/fastapi
+          cd /var/www/html/fastapi || exit
+          git config --global --add safe.directory /var/www/html/fastapi
           git pull origin main
-          echo "Deployed successfully: $(git rev-parse --short HEAD)"
+          echo "✅ Deployed successfully: $(git rev-parse --short HEAD)"
           EOF
