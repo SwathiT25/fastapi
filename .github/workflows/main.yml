@@ -24,9 +24,12 @@ jobs:
       # 3️⃣ Deploy via SSH
       - name: Deploy to server
         run: |
-          ssh -i ~/.ssh/gh_actions_ed25519 -o StrictHostKeyChecking=no user@server "
-            cd /path/to/fastapi/app &&
+          ssh -i ~/.ssh/gh_actions_ed25519 -o StrictHostKeyChecking=no \
+          ${{ secrets.USER_NAME }}@${{ secrets.HOST_NAME }} "
+            cd /home/${{ secrets.USER_NAME }}/fastapi &&
             git pull origin main &&
             pip install -r requirements.txt &&
             systemctl restart fastapi.service
+          "
+
           "
