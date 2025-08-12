@@ -1,0 +1,32 @@
+name: Deploy FastAPI App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Pull latest code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set up SSH key from GitHub secret
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/gh_actions_ed25519
+          chmod 600 ~/.ssh/gh_actions_ed25519
+
+      # 3️⃣ Deploy via SSH
+      - name: Deploy to server
+        run: |
+          ssh -i ~/.ssh/gh_actions_ed25519 -o StrictHostKeyChecking=no user@server "
+            cd /path/to/fastapi/app &&
+            git pull origin main &&
+            pip install -r requirements.txt &&
+            systemctl restart fastapi.service
+          "
