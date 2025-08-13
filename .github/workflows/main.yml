@@ -2,24 +2,25 @@ name: Deploy FastAPI App
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
+    name: Deploy to Remote Server
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up SSH key
+      - name: Deploy in Remote Server
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          HOST_NAME: ${{ secrets.HOST_NAME }}
+          USER_NAME: ${{ secrets.USER_NAME }}
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-      - name: Deploy code via SSH
-        run: |
-          ssh -i ~/.ssh/id_ed25519 trinipi@192.168.28.195 'cd /home/trinipi/fastapi && git pull origin main'
-       
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
+            cd /home/trinipi/fastapi &&
+            git pull origin main &&
+            # If you want to restart FastAPI service:
+            sudo systemctl stop fastapi &&
+            sudo systemctl daemon-reload &&
+            sudo systemctl start fastapi
+          "
