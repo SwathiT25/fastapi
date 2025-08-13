@@ -10,20 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Pull latest code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Set up SSH key from GitHub secret
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/gh_actions_ed25519
           chmod 600 ~/.ssh/gh_actions_ed25519
 
-      # 3️⃣ Deploy via SSH
       - name: Deploy code via SSH
         run: |
-          ssh -i ~/.ssh/gh_actions_ed25519 trinipi@192.168.28.195 'cd /home/trinipi/fastapi && git pull origin main'
-
-          
+          ssh -i ~/.ssh/gh_actions_ed25519 -o StrictHostKeyChecking=no trinipi@192.168.28.195 '
+            pwd
+            ls -la
+            git pull origin main
+          '
