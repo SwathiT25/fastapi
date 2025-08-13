@@ -20,15 +20,6 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
 
       - name: Deploy code via SSH
-        run: |
-<<<<<<< HEAD
-          ssh -i ~/.ssh/gh_actions_ed25519 -o StrictHostKeyChecking=no trinipi@192.168.28.195 '
-            pwd
-            ls -la
-            git pull origin main
-          '
-=======
+          run: |
           ssh -i ~/.ssh/id_ed25519 trinipi@192.168.28.195 'cd /home/trinipi/fastapi && git pull origin main'
-
-          
->>>>>>> 4bfb577fb02829e2d8e175835dcc63c7a6317499
+       
