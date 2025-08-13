@@ -20,6 +20,6 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
 
       - name: Deploy code via SSH
-          run: |
+        run: |
           ssh -i ~/.ssh/id_ed25519 trinipi@192.168.28.195 'cd /home/trinipi/fastapi && git pull origin main'
        
